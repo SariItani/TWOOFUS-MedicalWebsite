@@ -5,7 +5,7 @@ const router = express.Router();
 const Notification = require('../models/Notification');
 
 router.post('/welcome', async (req, res) => {
-    const { email, username } = req.body;
+    const { email, username, userId } = req.body;
     const signupMessage = `Hello ${username},\n\nThank you for signing up! We will support you throughout your health journey.\n\nBest regards,\nThe Team`;
     try {
         await sendEmail(
@@ -14,7 +14,7 @@ router.post('/welcome', async (req, res) => {
             signupMessage
         );
         const notification = new Notification({
-            user: req.user.id,
+            user: userId,
             message: signupMessage,
             type: 'registration',
         });
@@ -26,31 +26,31 @@ router.post('/welcome', async (req, res) => {
 });
 
 router.post('/welcome-login', async (req, res) => {
-    const { email, username } = req.body;
-
+    const { email, username, userId } = req.body;
+    const currentTime = new Date().toLocaleString();
+    const loginMessage = `Hello ${username},\n\nMost Recent Login at ${currentTime}.\n\nBest regards,\nThe Team`;
     try {
-        const currentTime = new Date().toLocaleString();
-        const loginMessage = `Hello ${username},\n\nMost Recent Login at ${currentTime}.\n\nBest regards,\nThe Team`
         await sendEmail(
             email,
             'Newest Login to Our Medical Platform',
             loginMessage
         );
         const notification = new Notification({
-            user: req.user.id,
+            user: userId,
             message: loginMessage,
             type: 'new_login',
         });
         await notification.save();
         res.status(200).json({ message: 'Login email sent' });
     } catch (error) {
+        console.error('Error sending email:', error);
         res.status(500).json({ message: 'Error sending email' });
     }
 });
 
 router.post('/diagnosis-update', async (req, res) => {
-    const { email, diagnosis } = req.body;
-    const diagnosisMessage = `Hello,\n\nYour recent diagnosis results are available: ${diagnosis}.\n\nBest regards,\nThe Team`
+    const { email, diagnosis, userId } = req.body;
+    const diagnosisMessage = `Hello,\n\nYour recent diagnosis results are available: ${diagnosis}.\n\nBest regards,\nThe Team`;
     try {
         await sendEmail(
             email,
@@ -58,7 +58,7 @@ router.post('/diagnosis-update', async (req, res) => {
             diagnosisMessage
         );
         const notification = new Notification({
-            user: req.user.id,
+            user: userId,
             message: diagnosisMessage,
             type: 'diagnosis_update',
         });

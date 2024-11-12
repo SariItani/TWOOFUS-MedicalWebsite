@@ -23,7 +23,8 @@ router.post('/signup', async (req, res) => {
         // Trigger welcome email through notifications route
         await axios.post(`http://${process.env.DOMAIN}:${process.env.PORT}/api/notifications/welcome`, {
             email,
-            username
+            username: user.username,
+            userId: user._id
         });
 
         res.status(201).json({ message: 'User registered successfully' });
@@ -58,7 +59,8 @@ router.post('/login', async (req, res) => {
         // Trigger login notification
         await axios.post(`http://${process.env.DOMAIN}:${process.env.PORT}/api/notifications/welcome-login`, {
             email,
-            username: user.username
+            username: user.username,
+            userId: user._id
         });
 
         res.json({ token });
