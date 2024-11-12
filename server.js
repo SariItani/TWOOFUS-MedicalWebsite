@@ -86,5 +86,5 @@ const saveMessage = async ({ conversationId, sender, receiver, message }) => {
 
 // Start the server
 server.listen(process.env.CHAT || 5555, () => {
-    console.log(`Server running on port ${process.env.CHAT || 5555}`);
+    console.log(`Chatting rooms running on port ${process.env.CHAT || 5555}`);
 });
