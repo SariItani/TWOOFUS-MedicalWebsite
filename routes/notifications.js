@@ -22,10 +22,11 @@ router.post('/welcome-login', async (req, res) => {
     const { email, username } = req.body;
 
     try {
+        const currentTime = new Date().toLocaleString();
         await sendEmail(
             email,
             'Newest Login to Our Medical Platform',
-            `Hello ${username},\n\nMost Recent Login at the time of sending this email.\n\nBest regards,\nThe Team`
+            `Hello ${username},\n\nMost Recent Login at ${currentTime}.\n\nBest regards,\nThe Team`
         );
         res.status(200).json({ message: 'Login email sent' });
     } catch (error) {

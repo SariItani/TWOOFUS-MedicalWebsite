@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>1-on-1 Chat</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div>
+        <h2>Enter Doctor's ID or Email to Start Chat</h2>
+        <input type="text" id="doctorId" placeholder="Doctor's ID or Email" />
+        <button onclick="joinChat()">Start Chat</button>
+    </div>
+    <div>
+        <input type="text" id="messageInput" placeholder="Type your message" />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+        const socket = io();
+        let conversationId;
+
+        function joinChat() {
+            const userId = "user_id_example"; // Replace with actual user ID or email
+            const doctorId = document.getElementById('doctorId').value;
+            conversationId = `${userId}_${doctorId}`;
+            socket.emit('joinRoom', { userId, doctorId });
+            console.log(`Joined room: ${conversationId}`);
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            socket.emit('chatMessage', { conversationId, sender: "user_id_example", receiver: "doctor_id_example", message });
+            messageInput.value = '';
+        }
+
+        socket.on('loadMessages', (messages) => {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = ''; // Clear previous messages
+            messages.forEach(msg => {
+                messagesDiv.innerHTML += `<p><strong>${msg.sender}:</strong> ${msg.message} <em>${new Date(msg.timestamp).toLocaleTimeString()}</em></p>`;
+            });
+        });
+
+        socket.on('message', (data) => {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `<p><strong>${data.sender}:</strong> ${data.message} <em>${new Date(data.timestamp).toLocaleTimeString()}</em></p>`;
+        });
+    </script>
+</body>
+</html>
