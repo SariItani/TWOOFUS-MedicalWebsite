@@ -18,11 +18,18 @@ router.post('/diagnose', protect, async (req, res) => {
         const diagnosis = response.data;
 
         // Send an email notification with the diagnosis results
-        await sendEmail(
-            req.user.email,
-            'Your Diagnosis Results',
-            `Hello ${req.user.username},\n\nYour recent diagnosis results are as follows:\n\n${JSON.stringify(diagnosis.probabilities)}\n\nBest regards,\nThe Team`
-        );
+        await axios.post(`http://${process.env.DOMAIN}:${process.env.PORT}/api/notifications/diagnosis-update`, {
+            email,
+            diagnosis
+        });
+
+        const newDiagnosis = new Diagnosis({
+            user: req.user.id,
+            symptoms,
+            diagnosis: Object.keys(diagnosis.probabilities)[0], // Save the main diagnosis
+            probabilities: diagnosis.probabilities,
+        });
+        await newDiagnosis.save();
 
         res.json(diagnosis);
     } catch (error) {
