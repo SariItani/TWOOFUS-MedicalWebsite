@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const http = require('http');
 const socketIo = require('socket.io');
+const authorize= require('./middleware/authorize');
 const Message = require('./models/Message');
 
 dotenv.config();
@@ -23,14 +24,21 @@ const diagnosisRoutes = require('./routes/diagnosis');
 const notificationRoutes = require('./routes/notifications');
 const chatRoutes = require('./routes/chat');
 const dashboardRoutes = require('./routes/dashboard');
+const doctor_dashboard = require('./routes/doctor-dashboard');
 
+// General Access level 0
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/medical-profile', medicalProfileRoutes);
-app.use('/api/diagnosis', diagnosisRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+
+// User Access level 1
+app.use('/api/user', authorize('doctor', 'user'), userRoutes);
+app.use('/api/medical-profile', authorize('doctor', 'user'), medicalProfileRoutes);
+app.use('/api/diagnosis', authorize('doctor', 'user'), diagnosisRoutes);
+app.use('/api/chat', authorize('doctor', 'user'), chatRoutes);
+app.use('/api/dashboard', authorize('doctor', 'user'), dashboardRoutes);
+
+// Doctor Access level 2
+app.use('/api/doctor-dashboard', authorize('doctor'), doctor_dashboard);
 
 app.get('/', (req, res) => {
     res.send('API is running...');

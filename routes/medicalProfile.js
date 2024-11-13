@@ -2,12 +2,12 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
-const authorize = require('../middleware/authorize');
+const authorize = require('../middleware/authorize'); // we will just keep this for the demonstration
 const MedicalProfile = require('../models/MedicalProfile');
 
 // Only doctors can access this route as an example
 router.get('/doctor-access', protect, authorize('doctor'), async (req, res) => {
-    res.json({ message: 'Welcome, doctor!' });
+    res.json({ message: 'Welcome, doctor!' }); // we will just keep this for testing basically
 });
 
 // Get the medical profile of the logged-in user

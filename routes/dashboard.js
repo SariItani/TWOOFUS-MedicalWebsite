@@ -9,13 +9,11 @@ const Notification = require('../models/Notification');
 
 // Middleware to ensure user is authenticated
 const { protect } = require('../middleware/auth');
-const authorize = require('../middleware/authorize');
-
 
 // 1. Get Basic Profile Information
 router.get('/profile', protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password'); // exclude password
+        const user = await User.findById(req.user.id).select('-password');
         const medicalProfile = await MedicalProfile.findOne({ user: req.user.id });
         res.json({ user, medicalProfile });
     } catch (error) {

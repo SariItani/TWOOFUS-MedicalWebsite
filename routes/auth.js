@@ -4,7 +4,6 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const sendEmail = require('../utils/mailer');
 const axios = require('axios');
 
 // Signup route

@@ -2,7 +2,6 @@
 const express = require('express');
 const axios = require('axios');
 const { protect } = require('../middleware/auth');
-const sendEmail = require('../utils/mailer');
 const router = express.Router();
 const Diagnosis = require('../models/Diagnosis');
 
