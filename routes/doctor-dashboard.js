@@ -6,7 +6,8 @@ const MedicalProfile = require('../models/MedicalProfile');
 
 router.post('/profile', async (req, res) => {
     const { experience, field, availability, cv, license } = req.body;
-    try {
+    try { 
+        // need to add a get doctor profile for anyone who wants to view the doctors details
         let doctorProfile = await DoctorProfile.findOneAndUpdate(
             { userId: req.user.id },
             { experience, field, availability, cv, license },
@@ -21,7 +22,6 @@ router.post('/profile', async (req, res) => {
 
 router.get('/patients', async (req, res) => {
     try {
-        // Add verification that the requesting user is actually a doctor
         if (req.user.role !== 'doctor') {
             return res.status(403).json({ message: 'Access forbidden: doctor rights required' });
         }
@@ -37,7 +37,6 @@ router.get('/patients/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Add verification that the requesting user is actually a doctor
         if (req.user.role !== 'doctor') {
             return res.status(403).json({ message: 'Access forbidden: doctor rights required' });
         }
