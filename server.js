@@ -4,8 +4,11 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const http = require('http');
 const socketIo = require('socket.io');
+const mongoose = require('mongoose');
 const authorize= require('./middleware/authorize');
+const ChatContainer = require('./models/ChatContainer');
 const Message = require('./models/Message');
+const User = require('./models/User');
 
 dotenv.config();
 connectDB();
@@ -54,29 +57,28 @@ app.listen(PORT, () => {
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
-    // Join a unique room based on conversationId (combination of user and doctor ID or email)
-    socket.on('joinRoom', ({ userId, doctorId }) => {
-        const conversationId = `${userId}_${doctorId}`;
-        socket.join(conversationId);
-        console.log(`User joined room: ${conversationId}`);
-
-        // Load existing messages for this conversation
-        Message.find({ conversationId })
-            .sort({ timestamp: 1 })
-            .then(messages => {
-                socket.emit('loadMessages', messages);
-            })
-            .catch(error => console.error('Error loading messages:', error));
+    socket.on('joinChat', ({ chatId }) => {
+        socket.join(chatId);
+        console.log(`User joined chat room: ${chatId}`);
     });
 
-    // Listen for message events and emit them to the specific room
-    socket.on('chatMessage', ({ conversationId, sender, receiver, message }) => {
-        const msgData = { conversationId, sender, receiver, message, timestamp: new Date() };
+    socket.on('sendMessage', async ({ chatId, senderId, content, attachments }) => {
+        try {
+            const message = new Message({ chat: chatId, sender: senderId, content, attachments });
+            await message.save();
 
-        io.to(conversationId).emit('message', msgData);
+            // Update chat with last message
+            const chat = await ChatContainer.findById(chatId);
+            chat.messages.push(message._id);
+            chat.lastMessage = message._id;
+            chat.updatedAt = Date.now();
+            await chat.save();
 
-        // Save the message to MongoDB
-        saveMessage(msgData);
+            // Emit to room
+            io.to(chatId).emit('message', message);
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
     });
 
     socket.on('disconnect', () => {
@@ -84,17 +86,6 @@ io.on('connection', (socket) => {
     });
 });
 
-// Save message to MongoDB
-const saveMessage = async ({ conversationId, sender, receiver, message }) => {
-    try {
-        const chatMessage = new Message({ conversationId, sender, receiver, message });
-        await chatMessage.save();
-    } catch (error) {
-        console.error('Error saving message:', error);
-    }
-};
-
-// Start the server
 server.listen(process.env.CHAT || 5555, () => {
-    console.log(`Chatting rooms running on port ${process.env.CHAT || 5555}`);
+    console.log(`Chatting running on port ${process.env.CHAT || 5555}`);
 });
