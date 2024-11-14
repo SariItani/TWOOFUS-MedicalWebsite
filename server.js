@@ -5,7 +5,7 @@ const connectDB = require('./config/db');
 const http = require('http');
 const socketIo = require('socket.io');
 const mongoose = require('mongoose');
-const authorize= require('./middleware/authorize');
+const authorize = require('./middleware/authorize');
 const ChatContainer = require('./models/ChatContainer');
 const Message = require('./models/Message');
 const User = require('./models/User');
@@ -50,9 +50,9 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server running on port ${PORT}`);
+// });
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
@@ -86,6 +86,6 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(process.env.CHAT || 5555, () => {
-    console.log(`Chatting running on port ${process.env.CHAT || 5555}`);
+server.listen(PORT, () => {
+    console.log(`Server running with HTTP and Socket.IO on port ${PORT}`);
 });

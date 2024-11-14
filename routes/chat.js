@@ -9,7 +9,7 @@ const User = require('../models/User');
 router.post('/initiate', async (req, res) => {
     const { doctorId } = req.body;
     const userId = req.user._id;
-
+    console.log(`Connecting between participants: ${userId} and ${doctorId}`)
     try {
         // Check if a chat already exists
         let chat = await ChatContainer.findOne({
@@ -27,7 +27,7 @@ router.post('/initiate', async (req, res) => {
         res.status(201).json({ chatId: chat._id, message: 'Chat initiated successfully' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: `Server error: ${error}` });
     }
 });
 
