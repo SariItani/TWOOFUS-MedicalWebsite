@@ -42,7 +42,7 @@ router.post('/diagnose', async (req, res) => {
     }
 });
 
-router.get('/history/:userId', protect, async (req, res) => {
+router.get('/history/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
         const history = await Diagnosis.find({ user: userId }).sort({ timestamp: -1 });

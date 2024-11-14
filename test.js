@@ -1,8 +1,6 @@
 const axios = require('axios');
 const baseUrl = 'http://localhost:5000/api';
-let userToken = '';
-let doctorToken = '';
-let profileId = '';
+let userToken, doctorToken, profileId;
 
 async function runTests() {
     try {
@@ -94,6 +92,30 @@ async function testDiagnosis() {
     } catch (error) {
         console.error("Diagnosis submission failed:", error.response ? error.response.data : error.message);
     }
+
+    try {
+        const user = await axios.get(`${baseUrl}/user/profile`, {
+            headers: { Authorization: `Bearer ${userToken}` }
+        });
+        const historyResponseUser = await axios.get(`${baseUrl}/diagnosis/history/${user.data._id}`, {
+            headers: { Authorization: `Bearer ${userToken}` }
+        });
+        console.log("User accessed diagnosis history:", historyResponseUser.data);
+    } catch (error) {
+        console.error("User accessed diagnosis history failed:", error.response ? error.response.data : error.message);
+    }
+
+    try {
+        const user = await axios.get(`${baseUrl}/user/profile`, {
+            headers: { Authorization: `Bearer ${userToken}` }
+        });
+        const historyResponseDoctor = await axios.get(`${baseUrl}/diagnosis/history/${user.data._id}`, {
+            headers: { Authorization: `Bearer ${doctorToken}` }
+        });
+        console.log("Doctor accessed diagnosis history:", historyResponseDoctor.data);
+    } catch (error) {
+        console.error("Doctor accessed diagnosis history failed:", error.response ? error.response.data : error.message);
+    }
 }
 
 // Test Dashboard
@@ -139,12 +161,31 @@ async function testDoctorDashboard() {
                 experience: "10 years",
                 field: "Cardiology",
                 availability: "Monday-Friday",
-                cv: "path/to/cv.pdf",
-                license: "path/to/license.pdf"
+                cv: "static/11915072_16.pdf",
+                license: "static/11915072_16.pdf"
             },
             { headers: { Authorization: `Bearer ${doctorToken}` } }
         );
         console.log("Doctor profile created or updated:", doctorProfileResponse.data);
+        // nested try catch
+        try {
+            const availabilityFetch = await axios.get(`${baseUrl}/doctor-dashboard/availability/${doctorProfileResponse.data.userId}`, {
+                headers: { Authorization: `Bearer ${doctorToken}` }
+            });
+            console.log("Doctor availability fetched:", availabilityFetch.data);
+        } catch (error) {
+            console.error("Fetching doctor availability failed:", error.response ? error.response.data : error.message);
+        }
+    
+        try {
+            const doctorProfileFetch = await axios.get(`${baseUrl}/doctor-dashboard/profile/${doctorProfileResponse.data.userId}`, {
+                headers: { Authorization: `Bearer ${userToken}` }
+            });
+            console.log("Doctor profile fetched:", doctorProfileFetch.data);
+        } catch (error) { // we should fail not succeed
+            console.error("Fetching doctor profile as user failed:", error.response ? error.response.data : error.message);
+        }
+
     } catch (error) {
         console.error("Doctor profile creation or update failed:", error.response ? error.response.data : error.message);
     }

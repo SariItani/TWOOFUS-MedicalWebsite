@@ -20,7 +20,7 @@ router.post('/profile', async (req, res) => {
     }
 });
 
-router.get('/profile/:doctorId', protect, async (req, res) => {
+router.get('/profile/:doctorId', async (req, res) => {
     try {
         const doctor = await DoctorProfile.findOne({ userId: req.params.doctorId });
         if (!doctor) {
@@ -32,7 +32,7 @@ router.get('/profile/:doctorId', protect, async (req, res) => {
     }
 });
 
-router.post('/availability', protect, async (req, res) => {
+router.post('/availability', async (req, res) => {
     try {
         const doctor = await DoctorProfile.findOneAndUpdate(
             { userId: req.user.id },
@@ -45,7 +45,7 @@ router.post('/availability', protect, async (req, res) => {
     }
 });
 
-router.get('/availability/:doctorId', protect, async (req, res) => {
+router.get('/availability/:doctorId', async (req, res) => {
     try {
         const doctor = await DoctorProfile.findOne({ userId: req.params.doctorId });
         if (!doctor) {
