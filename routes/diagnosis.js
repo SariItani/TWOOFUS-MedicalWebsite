@@ -42,4 +42,14 @@ router.post('/diagnose', async (req, res) => {
     }
 });
 
+router.get('/history/:userId', protect, async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const history = await Diagnosis.find({ user: userId }).sort({ timestamp: -1 });
+        res.status(200).json(history);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching diagnosis history' });
+    }
+});
+
 module.exports = router;

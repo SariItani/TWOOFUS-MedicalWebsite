@@ -117,6 +117,15 @@ async function testDashboard() {
     } catch (error) {
         console.error("Doctor dashboard patients list access failed:", error.response ? error.response.data : error.message);
     }
+
+    try {
+        const diagnosisHistory = await axios.get(`${baseUrl}/dashboard/diagnosis-history`, {
+            headers: { Authorization: `Bearer ${userToken}` }
+        });
+        console.log("Diagnoisis History accessed:", diagnosisHistory.data);
+    } catch (error) {
+        console.error("User dashboard access failed:", error.response ? error.response.data : error.message);
+    }
 }
 
 // Test Doctor Dashboard

@@ -20,6 +20,43 @@ router.post('/profile', async (req, res) => {
     }
 });
 
+router.get('/profile/:doctorId', protect, async (req, res) => {
+    try {
+        const doctor = await DoctorProfile.findOne({ userId: req.params.doctorId });
+        if (!doctor) {
+            return res.status(404).json({ message: 'Doctor not found' });
+        }
+        res.status(200).json(doctor);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching doctor profile' });
+    }
+});
+
+router.post('/availability', protect, async (req, res) => {
+    try {
+        const doctor = await DoctorProfile.findOneAndUpdate(
+            { userId: req.user.id },
+            { availability: req.body.availability },
+            { new: true, upsert: true }
+        );
+        res.status(200).json(doctor);
+    } catch (error) {
+        res.status(500).json({ message: 'Error setting availability' });
+    }
+});
+
+router.get('/availability/:doctorId', protect, async (req, res) => {
+    try {
+        const doctor = await DoctorProfile.findOne({ userId: req.params.doctorId });
+        if (!doctor) {
+            return res.status(404).json({ message: 'Doctor not found' });
+        }
+        res.status(200).json(doctor.availability);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching doctor availability' });
+    }
+});
+
 router.get('/patients', async (req, res) => {
     try {
         if (req.user.role !== 'doctor') {
