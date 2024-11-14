@@ -158,6 +158,40 @@ async function testChat() {
     } catch (error) {
         console.error("User access to updated chat history failed:", error.response ? error.response.data : error.message);
     }
+
+    // Step 8: Doctor sending an image to User
+    try {
+        const imageAttachment = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA..."; // shortened base64 of a PNG
+        const response = await axios.post(
+            `${baseUrl}/chat/send-message`,
+            {
+                chatId: chatId1,  // Chat ID from prior test between User and existing Doctor
+                content: "Here is an image attachment.",
+                attachments: [imageAttachment]  // Sending the image as an attachment
+            },
+            { headers: { Authorization: `Bearer ${doctorToken}` } }
+        );
+        console.log("Doctor sent image to User:", response.data);
+    } catch (error) {
+        console.error("Error sending image from Doctor to User:", error.response ? error.response.data : error.message);
+    }
+
+    // Step 9: User sending a PDF to Doctor
+    try {
+        const pdfAttachment = "data:application/pdf;base64,JVBERi0xLjMKJcfs..."; // shortened base64 of a PDF
+        const response = await axios.post(
+            `${baseUrl}/chat/send-message`,
+            {
+                chatId: chatId1,  // Chat ID from prior test between User and existing Doctor
+                content: "Here is a PDF attachment.",
+                attachments: [pdfAttachment]  // Sending the PDF as an attachment
+            },
+            { headers: { Authorization: `Bearer ${userToken}` } }
+        );
+        console.log("User sent PDF to Doctor:", response.data);
+    } catch (error) {
+        console.error("Error sending PDF from User to Doctor:", error.response ? error.response.data : error.message);
+    }
 }
 
 testChat();
