@@ -161,13 +161,13 @@ async function testChat() {
 
     // Step 8: Doctor sending an image to User
     try {
-        const imageAttachment = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA..."; // shortened base64 of a PNG
+        const imagePath = "static/1703611662265.png";
         const response = await axios.post(
-            `${baseUrl}/chat/send-message`,
+            `${baseUrl}/send-message`,
             {
-                chatId: chatId1,  // Chat ID from prior test between User and existing Doctor
+                chatId: chatId,
                 content: "Here is an image attachment.",
-                attachments: [imageAttachment]  // Sending the image as an attachment
+                attachments: [imagePath]
             },
             { headers: { Authorization: `Bearer ${doctorToken}` } }
         );
@@ -178,13 +178,13 @@ async function testChat() {
 
     // Step 9: User sending a PDF to Doctor
     try {
-        const pdfAttachment = "data:application/pdf;base64,JVBERi0xLjMKJcfs..."; // shortened base64 of a PDF
+        const pdfPath = "static/11915072_16.pdf";
         const response = await axios.post(
             `${baseUrl}/chat/send-message`,
             {
-                chatId: chatId1,  // Chat ID from prior test between User and existing Doctor
+                chatId: chatId,
                 content: "Here is a PDF attachment.",
-                attachments: [pdfAttachment]  // Sending the PDF as an attachment
+                attachments: [pdfPath]
             },
             { headers: { Authorization: `Bearer ${userToken}` } }
         );
