@@ -1,12 +1,10 @@
 // routes/doctor-dashboard.js
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth');
 const DoctorProfile = require('../models/DoctorProfile');
 const MedicalProfile = require('../models/MedicalProfile');
 
-// Doctor profile creation/update
-router.post('/profile', protect, async (req, res) => {
+router.post('/profile', async (req, res) => {
     const { experience, field, availability, cv, license } = req.body;
     try {
         let doctorProfile = await DoctorProfile.findOneAndUpdate(
@@ -21,9 +19,12 @@ router.post('/profile', protect, async (req, res) => {
     }
 });
 
-// List all patients
-router.get('/patients', protect, async (req, res) => {
+router.get('/patients', async (req, res) => {
     try {
+        // Add verification that the requesting user is actually a doctor
+        if (req.user.role !== 'doctor') {
+            return res.status(403).json({ message: 'Access forbidden: doctor rights required' });
+        }
         const patients = await MedicalProfile.find();
         res.status(200).json(patients);
     } catch (error) {
@@ -32,12 +33,15 @@ router.get('/patients', protect, async (req, res) => {
     }
 });
 
-// View individual patient details
-router.get('/patients/:id', protect, async (req, res) => {
+router.get('/patients/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const patient = await MedicalProfile.findById(id).populate('user', 'username email'); // Populate user data
+        // Add verification that the requesting user is actually a doctor
+        if (req.user.role !== 'doctor') {
+            return res.status(403).json({ message: 'Access forbidden: doctor rights required' });
+        }
+        const patient = await MedicalProfile.findById(id).populate('user', 'username email');
         if (!patient) {
             return res.status(404).json({ message: 'Patient not found' });
         }

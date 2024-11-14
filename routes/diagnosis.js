@@ -1,11 +1,10 @@
 // routes/diagnosis.js
 const express = require('express');
 const axios = require('axios');
-const { protect } = require('../middleware/auth');
 const router = express.Router();
 const Diagnosis = require('../models/Diagnosis');
 
-router.post('/diagnose', protect, async (req, res) => {
+router.post('/diagnose', async (req, res) => {
     const { symptoms } = req.body;
 
     if (!symptoms || !Array.isArray(symptoms) || symptoms.length === 0) {
@@ -13,20 +12,26 @@ router.post('/diagnose', protect, async (req, res) => {
     }
 
     try {
-        const response = await axios.post(`http://${process.env.DOMAIN}:${process.env.PyPORT}/diagnose`, { symptoms });
+        const response = await axios.post(
+            `http://${process.env.DOMAIN}:${process.env.PyPORT}/diagnose`,
+            { symptoms }
+        );
         const diagnosis = response.data;
 
         // Send an email notification with the diagnosis results
-        await axios.post(`http://${process.env.DOMAIN}:${process.env.PORT}/api/notifications/diagnosis-update`, {
-            email: req.user.email,
-            diagnosis: Object.keys(diagnosis.probabilities)[0],
-            userId: req.user.id
-        });
+        await axios.post(
+            `http://${process.env.DOMAIN}:${process.env.PORT}/api/notifications/diagnosis-update`,
+            {
+                email: req.user.email,
+                diagnosis: Object.keys(diagnosis.probabilities)[0],
+                userId: req.user.id
+            }
+        );
 
         const newDiagnosis = new Diagnosis({
             user: req.user.id,
             symptoms,
-            diagnosis: Object.keys(diagnosis.probabilities)[0], // Save the main diagnosis
+            diagnosis: Object.keys(diagnosis.probabilities)[0],
             probabilities: diagnosis.probabilities,
         });
         await newDiagnosis.save();

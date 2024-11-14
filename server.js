@@ -17,6 +17,8 @@ app.use(express.static('static'));
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const { protect } = require('./middleware/auth');
+
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const medicalProfileRoutes = require('./routes/medicalProfile');
@@ -31,14 +33,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // User Access level 1
-app.use('/api/user', authorize('doctor', 'user'), userRoutes);
-app.use('/api/medical-profile', authorize('doctor', 'user'), medicalProfileRoutes);
-app.use('/api/diagnosis', authorize('doctor', 'user'), diagnosisRoutes);
-app.use('/api/chat', authorize('doctor', 'user'), chatRoutes);
-app.use('/api/dashboard', authorize('doctor', 'user'), dashboardRoutes);
+app.use('/api/user', protect, authorize('doctor', 'user'), userRoutes);
+app.use('/api/medical-profile', protect, authorize('doctor', 'user'), medicalProfileRoutes);
+app.use('/api/diagnosis', protect, authorize('doctor', 'user'), diagnosisRoutes);
+app.use('/api/chat', protect, authorize('doctor', 'user'), chatRoutes);
+app.use('/api/dashboard', protect, authorize('doctor', 'user'), dashboardRoutes);
 
 // Doctor Access level 2
-app.use('/api/doctor-dashboard', authorize('doctor'), doctor_dashboard);
+app.use('/api/doctor-dashboard', protect, authorize('doctor'), doctor_dashboard);
 
 app.get('/', (req, res) => {
     res.send('API is running...');

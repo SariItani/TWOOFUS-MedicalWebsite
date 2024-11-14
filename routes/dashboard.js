@@ -7,11 +7,8 @@ const Message = require('../models/Message');
 const Diagnosis = require('../models/Diagnosis');
 const Notification = require('../models/Notification');
 
-// Middleware to ensure user is authenticated
-const { protect } = require('../middleware/auth');
-
-// 1. Get Basic Profile Information
-router.get('/profile', protect, async (req, res) => {
+// Remove protect middleware from individual routes since it's now in server.js
+router.get('/profile', async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         const medicalProfile = await MedicalProfile.findOne({ user: req.user.id });
@@ -21,41 +18,50 @@ router.get('/profile', protect, async (req, res) => {
     }
 });
 
-// 2. Get Diagnosis History
-router.get('/diagnosis-history', protect, async (req, res) => {
+router.get('/diagnosis-history', async (req, res) => {
     try {
-        const diagnoses = await Diagnosis.find({ user: req.user.id }).sort({ timestamp: -1 });
+        const diagnoses = await Diagnosis.find({ user: req.user.id })
+            .sort({ timestamp: -1 });
         res.json(diagnoses);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// 3. Get Notifications
-router.get('/notifications', protect, async (req, res) => {
+router.get('/notifications', async (req, res) => {
     try {
-        const notifications = await Notification.find({ user: req.user.id }).sort({ date: -1 });
+        const notifications = await Notification.find({ user: req.user.id })
+            .sort({ date: -1 });
         res.json(notifications);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// 4. Get Chat History with Doctors
-router.get('/chat-history', protect, async (req, res) => {
+router.get('/chat-history', async (req, res) => {
     try {
-        const messages = await Message.find({ sender: req.user.id }).sort({ timestamp: 1 });
+        const messages = await Message.find({
+            $or: [
+                { sender: req.user.id },
+                { receiver: req.user.id }
+            ]
+        }).sort({ timestamp: 1 });
         res.json(messages);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// 5. Activity Summary
-router.get('/activity-summary', protect, async (req, res) => {
+router.get('/activity-summary', async (req, res) => {
     try {
-        const latestDiagnosis = await Diagnosis.findOne({ user: req.user.id }).sort({ timestamp: -1 });
-        const latestMessage = await Message.findOne({ sender: req.user.id }).sort({ timestamp: -1 });
+        const latestDiagnosis = await Diagnosis.findOne({ user: req.user.id })
+            .sort({ timestamp: -1 });
+        const latestMessage = await Message.findOne({
+            $or: [
+                { sender: req.user.id },
+                { receiver: req.user.id }
+            ]
+        }).sort({ timestamp: -1 });
         res.json({
             latestDiagnosis,
             latestMessage,
