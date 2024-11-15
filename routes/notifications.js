@@ -3,6 +3,7 @@ const express = require('express');
 const sendEmail = require('../utils/mailer');
 const router = express.Router();
 const Notification = require('../models/Notification');
+const User = require('../models/User');
 
 router.post('/welcome', async (req, res) => {
     const { email, username, userId } = req.body;
@@ -66,6 +67,33 @@ router.post('/diagnosis-update', async (req, res) => {
         res.status(200).json({ message: 'Diagnosis update email sent' });
     } catch (error) {
         res.status(500).json({ message: 'Error sending email' });
+    }
+});
+
+router.post('/chat-message', async (req, res) => {
+    const { senderId, receiverId } = req.body;
+    console.log(`Creating new notification from ${senderId} to ${receiverId}`);
+    try {
+        const sender = await User.findById(senderId);
+        const receiver = await User.findById(receiverId);
+        const messageNotification = `New message from ${sender.username}.`;
+        await sendEmail(
+            receiver.email,
+            'New Message',
+            messageNotification
+        );
+        // Save notification in the database
+        const notification = new Notification({
+            user: receiverId,
+            message: messageNotification,
+            type: 'chat_message',
+        });
+        await notification.save();
+
+        res.status(200).json({ message: 'Chat notification sent' });
+    } catch (error) {
+        console.error('Error sending chat notification:', error);
+        res.status(500).json({ message: 'Error sending chat notification' });
     }
 });
 

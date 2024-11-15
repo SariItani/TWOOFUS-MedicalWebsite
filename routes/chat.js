@@ -4,6 +4,7 @@ const router = express.Router();
 const ChatContainer = require('../models/ChatContainer');
 const Message = require('../models/Message');
 const User = require('../models/User');
+const axios = require('axios');
 
 // Initiate a new chat
 router.post('/initiate', async (req, res) => {
@@ -78,6 +79,19 @@ router.post('/:chatId/message', async (req, res) => {
         chat.lastMessage = message._id;
         chat.updatedAt = Date.now();
         await chat.save();
+
+        // Notify the receivers
+        const receiversIds = chat.participants.filter(
+            (participant) => !participant.equals(req.user._id)
+        );
+        console.log(`Participants in the chatroom are: ${receiversIds}`);
+        for (const participantId of receiversIds) { 
+            console.log(`Sending Message Email for ${participantId}`);
+            await axios.post(`http://${process.env.DOMAIN}:${process.env.PORT}/api/notifications/chat-message`, {
+                senderId: senderId,
+                receiverId: participantId
+            });
+        }
 
         res.status(201).json({ message: 'Message sent', data: message });
     } catch (error) {

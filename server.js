@@ -50,9 +50,6 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//     console.log(`Server running on port ${PORT}`);
-// });
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
