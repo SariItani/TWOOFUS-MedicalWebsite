@@ -13,6 +13,9 @@ const MedicalProfileSchema = new mongoose.Schema({
     sex: {
         type: String,
     },
+    conditions: {
+        type: String,
+    },
     allergies: {
         type: String,
     },
