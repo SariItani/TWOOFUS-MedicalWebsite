@@ -5,7 +5,7 @@ const MedicalProfile = require('../models/MedicalProfile');
 
 // Search doctors based on query parameters
 router.get('/', async (req, res) => {
-    const { specialization, availability, experience } = req.query;
+    const { specialization, availability, experience } = req.params;
 
     try {
         const query = {};
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
             query.experience = { $gte: Number(experience) };
         }
 
-        const doctors = await DoctorProfile.find(query);
+        const doctors = await DoctorProfile.find(query).userId;
         res.json(doctors);
     } catch (error) {
         console.error(error);
@@ -37,23 +37,27 @@ router.get('/recommend', async (req, res) => {
         }
 
         // Fetch all doctors
-        const doctors = await DoctorProfile.find({ license: { $exists: true } }); // Only licensed doctors
+        const doctors = await DoctorProfile.find({ license: { $exists: true } });
 
         // Compute priority scores
         const recommendations = doctors.map(doctor => {
             let score = 0;
 
-            // Match user condition with doctor specialization
-            const matches = doctor.field.filter(specialty =>
-                userProfile.conditions.includes(specialty)
-            );
-            score += matches.length * 50; // 50 points per match
+            // Safely check if conditions exist and match
+            if (userProfile.conditions && doctor.field && 
+                userProfile.conditions.toLowerCase() === doctor.field.toLowerCase()) {
+                score += 50;
+            }
 
             // Add points for years of experience
-            score += doctor.experience * 10;
+            if (doctor.experience) {
+                // Convert experience to number if it's stored as string
+                score += Number(doctor.experience) * 10;
+            }
 
             // Check availability
-            if (doctor.availability.includes(req.query.availability || '')) {
+            if (doctor.availability && req.query.availability && 
+                doctor.availability.includes(req.query.availability)) {
                 score += 10;
             }
 
@@ -66,7 +70,7 @@ router.get('/recommend', async (req, res) => {
         res.json(recommendations.map(r => r.doctor));
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error' + error });
     }
 });
 

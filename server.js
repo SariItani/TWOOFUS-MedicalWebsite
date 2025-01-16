@@ -30,6 +30,7 @@ const notificationRoutes = require('./routes/notifications');
 const chatRoutes = require('./routes/chat');
 const dashboardRoutes = require('./routes/dashboard');
 const doctor_dashboard = require('./routes/doctor-dashboard');
+const searchRoutes = require('./routes/search');
 
 // General Access level 0
 app.use('/api/auth', authRoutes);
@@ -41,6 +42,7 @@ app.use('/api/medical-profile', protect, authorize('doctor', 'user'), medicalPro
 app.use('/api/diagnosis', protect, authorize('doctor', 'user'), diagnosisRoutes);
 app.use('/api/chat', protect, authorize('doctor', 'user'), chatRoutes);
 app.use('/api/dashboard', protect, authorize('doctor', 'user'), dashboardRoutes);
+app.use('/api/search', protect, authorize('doctor', 'user'), searchRoutes);
 
 // Doctor Access level 2
 app.use('/api/doctor-dashboard', protect, authorize('doctor'), doctor_dashboard);
