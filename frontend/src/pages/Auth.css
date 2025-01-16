@@ -1,0 +1,74 @@
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #1a1a1a;
+}
+
+.auth-form {
+  padding: 20px;
+  background: #282828;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  min-width: 300px;
+}
+
+.auth-form h2 {
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"] {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #404040;
+  border-radius: 5px;
+  background: #333333;
+  color: #ffffff;
+}
+
+.auth-form input[type="text"]::placeholder,
+.auth-form input[type="email"]::placeholder,
+.auth-form input[type="password"]::placeholder {
+  color: #888888;
+}
+
+.radio-group {
+  margin: 15px 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.radio-label {
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+  cursor: pointer;
+}
+
+.auth-form button {
+  width: 100%;
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.auth-form button:hover {
+  background: #0056b3;
+}
