@@ -32,11 +32,10 @@ const dashboardRoutes = require('./routes/dashboard');
 const doctor_dashboard = require('./routes/doctor-dashboard');
 const searchRoutes = require('./routes/search');
 
-const path = require('path');
-app.use(express.static(path.join(__dirname, 'frontend/build')));
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
-});
+// app.use(express.static(path.join(__dirname, 'frontend/build')));
+// app.get('*', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+// });
 
 // General Access level 0
 app.use('/api/auth', authRoutes);
@@ -53,8 +52,18 @@ app.use('/api/search', protect, authorize('doctor', 'user'), searchRoutes);
 // Doctor Access level 2
 app.use('/api/doctor-dashboard', protect, authorize('doctor'), doctor_dashboard);
 
-app.get('/', (req, res) => {
+app.get('/api/', (req, res) => {
     res.send('API is running...');
+});
+
+const path = require('path');
+const frontendPath = path.join(__dirname, 'frontend/build');
+app.use(express.static(frontendPath));
+app.get('*', (req, res) => {
+    if (req.originalUrl.startsWith('/api')) {
+        return res.status(404).send({ message: 'API route not found' });
+    }
+    res.sendFile(path.resolve(frontendPath, 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
