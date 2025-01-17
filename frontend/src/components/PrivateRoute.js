@@ -6,7 +6,7 @@ const PrivateRoute = ({ children, role }) => {
   const user = JSON.parse(localStorage.getItem('user'));
 
   if (!token || user.role !== role) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/access-denied" replace />;
   }
 
   return children;

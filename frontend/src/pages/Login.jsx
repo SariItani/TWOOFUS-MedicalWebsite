@@ -20,7 +20,7 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(user));
 
       // Redirect based on user role
-      if (user.role === 'patient') {
+      if (user.role === 'user') {
         navigate('/patient/dashboard');
       } else if (user.role === 'doctor') {
         navigate('/doctor/dashboard');
