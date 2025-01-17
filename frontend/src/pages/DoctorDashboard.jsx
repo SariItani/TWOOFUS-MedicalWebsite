@@ -13,8 +13,8 @@ const DoctorDashboard = () => {
             <h1>Welcome, Dr. {user.username}!</h1>
             <div className="dashboard-links">
             <a href="/patients">View Patients</a>
-            <a href="/availability">Manage Availability</a>
-            <a href="/chat">Manage Chats</a>
+            {/* <a href="/availability">Manage Availability</a>
+            <a href="/chat">Manage Chats</a> */}
             </div>
         </div>
         <Footer />

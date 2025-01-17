@@ -32,11 +32,6 @@ const dashboardRoutes = require('./routes/dashboard');
 const doctor_dashboard = require('./routes/doctor-dashboard');
 const searchRoutes = require('./routes/search');
 
-// app.use(express.static(path.join(__dirname, 'frontend/build')));
-// app.get('*', (req, res) => {
-//     res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
-// });
-
 // General Access level 0
 app.use('/api/auth', authRoutes);
 app.use('/api/notifications', notificationRoutes);
