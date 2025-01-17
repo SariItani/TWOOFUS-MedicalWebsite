@@ -1,4 +1,5 @@
 import React from 'react';
+import Footer from '../components/Footer';
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -17,6 +18,7 @@ const LandingPage = () => {
             <h3>Expert Doctors</h3>
             <p>Connect with qualified healthcare professionals</p>
           </div>
+          {/* To Do: Actually integrate the features in our website instead of some random "scheduling" or whatever */}
           <div className="feature-card">
             <div className="feature-icon">📅</div>
             <h3>Easy Scheduling</h3>
@@ -42,6 +44,7 @@ const LandingPage = () => {
       </div>
 
       <div className="background-pattern"></div>
+      <Footer />
     </div>
   );
 };
